@@ -1,0 +1,28 @@
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+import random
+
+user_balances = {}
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    user_balances.setdefault(user_id, 0)
+    await update.message.reply_text("Selamat datang di Katt Mining Bot! Gunakan /mine untuk menambang.")
+
+async def mine(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    coins = random.randint(1, 10)
+    user_balances[user_id] = user_balances.get(user_id, 0) + coins
+    await update.message.reply_text(f"Kamu mendapatkan {coins} koin! Totalmu: {user_balances[user_id]}")
+
+async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    balance = user_balances.get(user_id, 0)
+    await update.message.reply_text(f"Saldo kamu saat ini: {balance} koin.")
+
+app = ApplicationBuilder().token("7738920455:AAE3NKQL3Ak3KPwJGVYDp5Fu8bc-up0Qfh4").build()
+app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("mine", mine))
+app.add_handler(CommandHandler("balance", balance))
+
+app.run_polling()
